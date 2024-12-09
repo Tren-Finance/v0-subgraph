@@ -1,0 +1,8 @@
+{
+  "arbitrum-one": {
+    "SingleLiquidityProvider": {
+      "address": "0xDC4a311f0D852934d9b51C0eAc7c7e13EA1DF11b",
+      "startBlock": 281992107
+    }
+  }
+}
