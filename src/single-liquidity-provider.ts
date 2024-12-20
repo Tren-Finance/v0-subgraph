@@ -1,3 +1,4 @@
+import { BigInt } from "@graphprotocol/graph-ts"
 import {
   AddressesSet as AddressesSetEvent,
   Approval as ApprovalEvent,
@@ -30,7 +31,8 @@ import {
   Transfer,
   TrenTokenSet,
   UpdatedRewardsPerShare,
-  Withdrawn
+  Withdrawn,
+  User
 } from "../generated/schema"
 
 export function handleAddressesSet(event: AddressesSetEvent): void {
@@ -120,17 +122,31 @@ export function handleDepositStatusChanged(
 }
 
 export function handleDeposited(event: DepositedEvent): void {
+  let user = User.load(event.params.user.toHex())
+  if (user == null) {
+    user = new User(event.params.user.toHex())
+    user.totalDeposited = BigInt.fromI32(0)
+    user.totalWithdrawn = BigInt.fromI32(0)
+    user.isActive = false
+    user.tvl = BigInt.fromI32(0)
+  }
+
   let entity = new Deposited(
     event.transaction.hash.concatI32(event.logIndex.toI32())
   )
-  entity.user = event.params.user
+  entity.user = user.id
   entity.amount = event.params.amount
-
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
 
   entity.save()
+
+  user.totalDeposited = user.totalDeposited.plus(event.params.amount)
+  user.isActive = user.totalDeposited.gt(user.totalWithdrawn)
+  let decimals = BigInt.fromI32(10).pow(18);
+  user.tvl = user.totalDeposited.minus(user.totalWithdrawn).div(decimals);
+  user.save()
 }
 
 export function handleInitialized(event: InitializedEvent): void {
@@ -242,16 +258,29 @@ export function handleUpdatedRewardsPerShare(
 }
 
 export function handleWithdrawn(event: WithdrawnEvent): void {
+  let user = User.load(event.params.user.toHex())
+  if (user == null) {
+    user = new User(event.params.user.toHex())
+    user.totalDeposited = BigInt.fromI32(0)
+    user.totalWithdrawn = BigInt.fromI32(0)
+    user.isActive = false
+    user.tvl = BigInt.fromI32(0)
+  }
+
   let entity = new Withdrawn(
     event.transaction.hash.concatI32(event.logIndex.toI32())
   )
-  entity.user = event.params.user
-  entity.SingleLiquidityProvider_id = event.params.id
+  entity.user = user.id
   entity.amount = event.params.amount
-
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
 
   entity.save()
+
+  user.totalWithdrawn = user.totalWithdrawn.plus(event.params.amount)
+  user.isActive = user.totalDeposited.gt(user.totalWithdrawn)
+  let decimals = BigInt.fromI32(10).pow(18);
+  user.tvl = user.totalDeposited.minus(user.totalWithdrawn).div(decimals);
+  user.save()
 }

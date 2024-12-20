@@ -54,7 +54,7 @@ type DepositStatusChanged @entity(immutable: true) {
 
 type Deposited @entity(immutable: true) {
   id: Bytes!
-  user: Bytes! # address
+  user: User!
   amount: BigInt! # uint256
   blockNumber: BigInt!
   blockTimestamp: BigInt!
@@ -130,10 +130,20 @@ type UpdatedRewardsPerShare @entity(immutable: true) {
 
 type Withdrawn @entity(immutable: true) {
   id: Bytes!
-  user: Bytes! # address
+  user: User!
   SingleLiquidityProvider_id: BigInt! # uint256
   amount: BigInt! # uint256
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
+}
+
+type User @entity {
+  id: ID!
+  isActive: Boolean!
+  tvl: BigInt!
+  deposits: [Deposited!] @derivedFrom(field: "user")
+  withdrawals: [Withdrawn!] @derivedFrom(field: "user")
+  totalDeposited: BigInt!
+  totalWithdrawn: BigInt!
 }
