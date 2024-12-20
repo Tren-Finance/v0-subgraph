@@ -66,3 +66,65 @@ dataSources:
         - event: Withdrawn(indexed address,indexed uint256,uint256)
           handler: handleWithdrawn
       file: ./src/single-liquidity-provider.ts
+  - kind: ethereum
+    name: SingleLiquidityProviderCurve
+    network: arbitrum-one
+    source:
+      address: "0xDFF4a68044eb68c60354810E9316B2B6DB88B3eb"
+      abi: SingleLiquidityProvider
+      startBlock: 281992107
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - AddressesSet
+        - Approval
+        - ClaimRewards
+        - ClaimStatusChanged
+        - DepositRemoved
+        - DepositStatusChanged
+        - Deposited
+        - Initialized
+        - OwnershipTransferStarted
+        - OwnershipTransferred
+        - Requested
+        - Transfer
+        - TrenTokenSet
+        - UpdatedRewardsPerShare
+        - Withdrawn
+      abis:
+        - name: SingleLiquidityProvider
+          file: ./abis/SingleLiquidityProvider.json
+      eventHandlers:
+        - event: AddressesSet(address,address,address,address)
+          handler: handleAddressesSet
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApproval
+        - event: ClaimRewards(indexed address,uint256)
+          handler: handleClaimRewards
+        - event: ClaimStatusChanged(bool)
+          handler: handleClaimStatusChanged
+        - event: DepositRemoved(indexed address)
+          handler: handleDepositRemoved
+        - event: DepositStatusChanged(bool)
+          handler: handleDepositStatusChanged
+        - event: Deposited(indexed address,uint256)
+          handler: handleDeposited
+        - event: Initialized(uint256,uint256,uint256,uint256)
+          handler: handleInitialized
+        - event: OwnershipTransferStarted(indexed address,indexed address)
+          handler: handleOwnershipTransferStarted
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: Requested(indexed address,indexed uint256,uint256)
+          handler: handleRequested
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: TrenTokenSet(address)
+          handler: handleTrenTokenSet
+        - event: UpdatedRewardsPerShare(indexed uint256,uint256,uint256)
+          handler: handleUpdatedRewardsPerShare
+        - event: Withdrawn(indexed address,indexed uint256,uint256)
+          handler: handleWithdrawn
+      file: ./src/single-liquidity-provider.ts
